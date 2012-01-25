@@ -7,7 +7,7 @@ public class DbFactory {
 	private DbFactory() {
 	}
 	
-	public static Adapter criaDbAdapter() {
+	public static DBAdapter criaDbAdapter() {
 		return new SQLiteAdapter();
 	}
 }

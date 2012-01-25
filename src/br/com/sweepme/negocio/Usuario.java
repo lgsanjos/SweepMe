@@ -1,10 +1,14 @@
 package br.com.sweepme.negocio;
 
+import java.util.Map;
+import java.util.TreeMap;
+
+import br.com.sweepme.database.Entidade;
 import br.com.sweepme.negocio.primitivos.Email;
 import br.com.sweepme.negocio.primitivos.Link;
 import br.com.sweepme.negocio.primitivos.Senha;
 
-public class Usuario {
+public class Usuario extends Entidade{
 	
 	private String nome;
 	private String apelido;
@@ -62,6 +66,22 @@ public class Usuario {
 		}	
 		
 		return false;
+	}
+
+	@Override
+	protected String getNomeTabela() {
+		return "Usuarios";
+	}
+
+	@Override
+	protected Map<String, String> getAtributos() {
+		Map<String, String> atributos = new TreeMap<String, String>();
+		atributos.put("nome", "TEXT");
+		atributos.put("apelido", "TEXT");
+		atributos.put("senha", "TEXT");
+		atributos.put("email", "TEXT");
+		atributos.put("facebook", "TEXT");
+		return atributos;
 	}	
 	
 
