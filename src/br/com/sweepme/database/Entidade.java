@@ -1,36 +1,70 @@
 package br.com.sweepme.database;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
 public abstract class Entidade {
-	
-	final private DBAdapter database;
-
+		
 	public Entidade() {
 		super();
 		this.database = DbFactory.criaDbAdapter();
 	}
 	
-	protected abstract String getNomeTabela();
-	protected abstract Map<String,String> getAtributos();
+	private final DBAdapter database;
+	private int id = 0;
 	
-	private String montaSqlCreateTable() {
-		String sql;
-		sql  = "CREATE TABLE " + getNomeTabela();
-		sql += "( ";
-		sql += "id integer primary key autoincrement";
-		for (Entry<String,String> atributo : getAtributos().entrySet()) {
-			sql += ", " +  atributo.getKey() + " " + atributo.getValue();
-		}
-		sql += ");";
+	private String executaGetterDe(String nomeAtributo) {
 		
-		return sql;
+		Method getter = null;
+		for (Method metodo : this.getClass().getDeclaredMethods()) {
+			if (metodo.getName().compareToIgnoreCase("get" + nomeAtributo) == 0) {
+				getter = metodo;
+			}
+		}
+		
+		Object[] argumentos = { null }; 
+		try {
+			String resultado = ((String) getter.invoke(this, argumentos).toString());
+			return resultado;
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		
+		return "";
 	}
 	
-	protected boolean createTable() {		
-		database.executaSQL(montaSqlCreateTable());
-		return false;
+	protected abstract String getNomeTabela();
+	protected abstract Map<String, String> getAtributos();
+	
+	protected void salvar() {
+		String sql;
+		
+		if (this.getId() == 0) {
+			sql = "INSERT INTO " + getNomeTabela() + " values (";
+			for (Entry<String, String> atributo : getAtributos().entrySet()) {
+				sql += " , "  + executaGetterDe(atributo.getKey());
+			}
+			sql += "";
+			
+		} else {
+			sql = "";
+		}
+		
+		this.database.executaSQL(sql);
 	}
+	
+	public int getId() {
+		return id;
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+		
 }
